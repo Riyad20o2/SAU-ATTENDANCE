@@ -23,11 +23,13 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [adminStatus, setAdminStatus] = useState<{ hasServiceAccount: boolean } | null>(null);
 
   useEffect(() => {
     const unsubStudents = subscribeToAllStudents(setStudents);
     const unsubTeachers = subscribeToAllTeachers(setTeachers);
     loadSettings();
+    checkAdminStatus();
     setIsLoading(false);
 
     return () => {
@@ -35,6 +37,16 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
       unsubTeachers();
     };
   }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const response = await fetch('/api/admin/status');
+      const data = await response.json();
+      setAdminStatus(data);
+    } catch (e) {
+      console.error("Failed to check admin status", e);
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -142,6 +154,19 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
               <Settings className="w-4 h-4" /> Settings
             </button>
           </div>
+
+          {adminStatus && !adminStatus.hasServiceAccount && (
+            <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl flex items-center gap-2 text-red-400 text-[10px] font-bold uppercase">
+              <Shield className="w-3 h-3" />
+              Admin SDK Key Missing: Deletion Disabled
+            </div>
+          )}
+          {adminStatus?.hasServiceAccount && (
+            <div className="bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-xl flex items-center gap-2 text-green-400 text-[10px] font-bold uppercase">
+              <Shield className="w-3 h-3" />
+              Admin SDK Connected
+            </div>
+          )}
 
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />

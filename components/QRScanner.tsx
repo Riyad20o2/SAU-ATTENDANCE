@@ -24,13 +24,22 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
     if (video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (ctx) {
-        canvas.height = video.videoHeight;
-        canvas.width = video.videoWidth;
+        // Use a smaller fixed size for scanning to improve performance
+        const scanSize = 480;
+        const ratio = video.videoWidth / video.videoHeight;
+        
+        if (ratio > 1) {
+          canvas.width = scanSize * ratio;
+          canvas.height = scanSize;
+        } else {
+          canvas.width = scanSize;
+          canvas.height = scanSize / ratio;
+        }
+
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
-        // Attempt to decode using jsQR if available
         try {
             const code = jsQR(imageData.data, imageData.width, imageData.height, {
                 inversionAttempts: "dontInvert",
@@ -38,15 +47,17 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
 
             if (code) {
                 onScan(code.data);
-                return; // Stop scanning on success
+                return;
             }
         } catch (e) {
-            // jsQR might not be installed in the preview environment.
-            // We continue scanning hoping it might appear or just show video.
+            // jsQR might not be available
         }
       }
     }
-    requestRef.current = requestAnimationFrame(scanFrame);
+    // Scan every 150ms instead of every frame to save battery and CPU on mobile
+    setTimeout(() => {
+      requestRef.current = requestAnimationFrame(scanFrame);
+    }, 150);
   }, [onScan]);
 
   useEffect(() => {

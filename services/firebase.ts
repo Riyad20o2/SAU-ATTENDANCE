@@ -747,8 +747,29 @@ export const updateTeacherProfileAdmin = async (uid: string, data: Partial<Teach
 };
 
 export const deleteUserAdmin = async (uid: string, role: 'student' | 'teacher'): Promise<void> => {
-  const collectionName = role === 'student' ? 'students' : 'teachers';
-  await deleteDoc(doc(db, collectionName, uid));
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Admin authentication required.");
+    
+    // Get the admin's ID token to authorize the server-side deletion
+    const idToken = await user.getIdToken();
+    
+    const response = await fetch('/api/admin/delete-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ uid, role, adminToken: idToken }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to delete user account.");
+    }
+  } catch (e: any) {
+    console.error("Error in deleteUserAdmin:", e);
+    throw e;
+  }
 };
 
 export const getSystemSettings = async (): Promise<any> => {
