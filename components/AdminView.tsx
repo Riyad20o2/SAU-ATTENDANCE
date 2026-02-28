@@ -100,9 +100,9 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
     try {
       await deleteUserAdmin(uid, activeTab === 'STUDENTS' ? 'student' : 'teacher');
       alert("User deleted successfully.");
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Failed to delete user.");
+      alert("Failed to delete user: " + (e.message || "Unknown error"));
     } finally {
       setIsDeleting(null);
     }
