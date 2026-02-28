@@ -156,9 +156,14 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
           </div>
 
           {adminStatus && !adminStatus.hasServiceAccount && (
-            <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl flex items-center gap-2 text-red-400 text-[10px] font-bold uppercase">
-              <Shield className="w-3 h-3" />
-              Admin SDK Key Missing: Deletion Disabled
+            <div className="flex flex-col items-end gap-1">
+              <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl flex items-center gap-2 text-red-400 text-[10px] font-bold uppercase">
+                <Shield className="w-3 h-3" />
+                Admin SDK Key Missing: Deletion Disabled
+              </div>
+              <p className="text-[9px] text-slate-500 max-w-[200px] text-right">
+                To enable user deletion, add the <code className="text-blue-400">FIREBASE_SERVICE_ACCOUNT</code> secret in AI Studio.
+              </p>
             </div>
           )}
           {adminStatus?.hasServiceAccount && (
@@ -293,9 +298,9 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
                           </button>
                           <button 
                             onClick={() => handleDelete(user.uid)}
-                            disabled={isDeleting === user.uid}
-                            className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
-                            title="Delete User"
+                            disabled={isDeleting === user.uid || !adminStatus?.hasServiceAccount}
+                            className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={!adminStatus?.hasServiceAccount ? "Deletion requires Admin SDK Key" : "Delete User"}
                           >
                             {isDeleting === user.uid ? (
                               <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
