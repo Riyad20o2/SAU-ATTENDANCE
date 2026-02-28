@@ -152,6 +152,13 @@ export const registerStudent = async (profile: StudentProfile, email: string, pa
       return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
   }
 
+  // Check if email already exists in Firestore
+  const emailQuery = query(collection(db, "students"), where("email", "==", email));
+  const emailSnap = await getDocs(emailQuery);
+  if (!emailSnap.empty) {
+      return { success: false, error: "This email is already registered. Please log in instead." };
+  }
+
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -328,6 +335,15 @@ export const loginStudentWithGoogle = async (): Promise<StudentProfile | null> =
         throw new Error("This Google account is registered as a Teacher. Please login to the Teacher Portal.");
     }
 
+    // Check if a student with this email already exists with a different UID
+    const emailQuery = query(collection(db, "students"), where("email", "==", user.email));
+    const emailSnap = await getDocs(emailQuery);
+    
+    if (!emailSnap.empty && emailSnap.docs[0].id !== user.uid) {
+        await signOut(auth);
+        throw new Error("This email is already registered with a different login method. Please use your original login method.");
+    }
+
     const docRef = doc(db, "students", user.uid);
     const docSnap = await getDoc(docRef);
 
@@ -382,6 +398,13 @@ export const loginStudentWithGoogle = async (): Promise<StudentProfile | null> =
 export const registerTeacher = async (profile: TeacherProfile, password: string): Promise<{ success: boolean; error?: string }> => {
   if (!isValidEducationalEmail(profile.email)) {
     return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
+  }
+
+  // Check if email already exists in Firestore
+  const emailQuery = query(collection(db, "teachers"), where("email", "==", profile.email));
+  const emailSnap = await getDocs(emailQuery);
+  if (!emailSnap.empty) {
+      return { success: false, error: "This email is already registered. Please log in instead." };
   }
 
   try {
@@ -540,6 +563,15 @@ export const loginTeacherWithGoogle = async (): Promise<TeacherProfile | null> =
     if (isStudent) {
         await signOut(auth);
         throw new Error("This Google account is registered as a Student. Please login to the Student Portal.");
+    }
+
+    // Check if a teacher with this email already exists with a different UID
+    const emailQuery = query(collection(db, "teachers"), where("email", "==", user.email));
+    const emailSnap = await getDocs(emailQuery);
+    
+    if (!emailSnap.empty && emailSnap.docs[0].id !== user.uid) {
+        await signOut(auth);
+        throw new Error("This email is already registered with a different login method. Please use your original login method.");
     }
 
     const docRef = doc(db, "teachers", user.uid);
