@@ -131,7 +131,11 @@ export const resendVerificationEmail = async (email: string, password: string): 
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     if (!user.emailVerified) {
-      await sendEmailVerification(user);
+      const actionCodeSettings = {
+        url: 'https://sau-attendance.vercel.app',
+        handleCodeInApp: false,
+      };
+      await sendEmailVerification(user, actionCodeSettings);
     }
     await signOut(auth);
   } catch (e: any) {
@@ -154,7 +158,11 @@ export const registerStudent = async (profile: StudentProfile, email: string, pa
     
     try {
         // Send verification email
-        await sendEmailVerification(user);
+        const actionCodeSettings = {
+          url: 'https://sau-attendance.vercel.app',
+          handleCodeInApp: false,
+        };
+        await sendEmailVerification(user, actionCodeSettings);
 
         await updateAuthProfile(user, {
           displayName: profile.name
@@ -382,7 +390,11 @@ export const registerTeacher = async (profile: TeacherProfile, password: string)
 
     try {
         // Send verification email
-        await sendEmailVerification(user);
+        const actionCodeSettings = {
+          url: 'https://sau-attendance.vercel.app',
+          handleCodeInApp: false,
+        };
+        await sendEmailVerification(user, actionCodeSettings);
 
         await updateAuthProfile(user, {
             displayName: profile.name
