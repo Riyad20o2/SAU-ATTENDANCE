@@ -314,7 +314,12 @@ const App: React.FC = () => {
 
             {role === UserRole.STUDENT && studentUser && (
                 <div className="animate-fade-in">
-                    <StudentView user={studentUser} onLogout={handleLogout} autoStartScan={autoScan} />
+                    <StudentView 
+                        user={studentUser} 
+                        onLogout={handleLogout} 
+                        autoStartScan={autoScan} 
+                        logoutCode={systemSettings.logoutCode}
+                    />
                 </div>
             )}
 
