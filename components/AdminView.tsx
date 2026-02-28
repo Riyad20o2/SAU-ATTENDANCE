@@ -162,7 +162,7 @@ const AdminView: React.FC<AdminViewProps> = ({ onLogout }) => {
                 Admin SDK Key Missing: Deletion Disabled
               </div>
               <p className="text-[9px] text-slate-500 max-w-[200px] text-right">
-                To enable user deletion, add the <code className="text-blue-400">FIREBASE_SERVICE_ACCOUNT</code> secret in AI Studio.
+                To enable user deletion, add the <code className="text-blue-400">FIREBASE_SERVICE_ACCOUNT</code> secret in your deployment settings (AI Studio or Vercel).
               </p>
             </div>
           )}
