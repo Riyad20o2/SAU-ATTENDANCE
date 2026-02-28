@@ -1,0 +1,7 @@
+{
+  "name": "SAU ATTENDANCE",
+  "description": "A smart attendance tracking system powered by Gemini. Teachers generate AI-enhanced class sessions via QR codes, and students scan to mark attendance instantly.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
