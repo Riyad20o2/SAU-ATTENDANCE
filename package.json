@@ -15,12 +15,15 @@
     "express": "^5.2.1",
     "firebase": "^12.9.0",
     "firebase-admin": "^13.7.0",
+    "framer-motion": "^12.34.3",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.564.0",
+    "motion": "^12.34.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-qr-code": "^2.0.18",
     "recharts": "^3.7.0",
+    "tailwindcss": "^4.2.1",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
