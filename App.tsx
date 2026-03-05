@@ -32,6 +32,10 @@ const App: React.FC = () => {
   const [systemSettings, setSystemSettings] = useState<any>({ logoutCode: '0109' });
 
   useEffect(() => {
+    document.title = "SAU Attendance System | Shatt Al-Arab University Portal";
+  }, []);
+
+  useEffect(() => {
     // Subscribe to system settings when authenticated
     let unsubscribeSettings: (() => void) | null = null;
     
