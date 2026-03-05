@@ -1,0 +1,23 @@
+{
+  "name": "SAU Attendance System",
+  "short_name": "SAU Attendance",
+  "description": "Smart attendance tracking for Shatt Al-Arab University.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#061526",
+  "theme_color": "#1e4b7a",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/sau/192/192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://picsum.photos/seed/sau/512/512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
