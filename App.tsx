@@ -11,6 +11,7 @@ import Logo from './components/Logo';
 import ShareModal from './components/ShareModal';
 import { getSystemSettings, subscribeToSystemSettings, auth } from './services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Analytics } from '@vercel/analytics/react';
 
 const App: React.FC = () => {
   const [role, setRole] = useState<UserRole>(UserRole.NONE);
@@ -549,6 +550,7 @@ const App: React.FC = () => {
                 </div>
             </div>
         )}
+      <Analytics />
     </div>
   );
 };
