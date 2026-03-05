@@ -335,15 +335,6 @@ export const loginStudentWithGoogle = async (): Promise<StudentProfile | null> =
         throw new Error("This Google account is registered as a Teacher. Please login to the Teacher Portal.");
     }
 
-    // Check if a student with this email already exists with a different UID
-    const emailQuery = query(collection(db, "students"), where("email", "==", user.email));
-    const emailSnap = await getDocs(emailQuery);
-    
-    if (!emailSnap.empty && emailSnap.docs[0].id !== user.uid) {
-        await signOut(auth);
-        throw new Error("This email is already registered with a different login method. Please use your original login method.");
-    }
-
     const docRef = doc(db, "students", user.uid);
     const docSnap = await getDoc(docRef);
 
@@ -563,15 +554,6 @@ export const loginTeacherWithGoogle = async (): Promise<TeacherProfile | null> =
     if (isStudent) {
         await signOut(auth);
         throw new Error("This Google account is registered as a Student. Please login to the Student Portal.");
-    }
-
-    // Check if a teacher with this email already exists with a different UID
-    const emailQuery = query(collection(db, "teachers"), where("email", "==", user.email));
-    const emailSnap = await getDocs(emailQuery);
-    
-    if (!emailSnap.empty && emailSnap.docs[0].id !== user.uid) {
-        await signOut(auth);
-        throw new Error("This email is already registered with a different login method. Please use your original login method.");
     }
 
     const docRef = doc(db, "teachers", user.uid);
