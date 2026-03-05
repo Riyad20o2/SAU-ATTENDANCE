@@ -1,0 +1,8 @@
+{
+  "appId": "com.sau.attendance",
+  "appName": "SAU Attendance",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
