@@ -183,7 +183,13 @@ const TeacherLogin: React.FC<TeacherLoginProps> = ({ onLogin, onBack }) => {
 
         const result = await registerTeacher(profile, password);
 
-        if (result.success) {
+        if (result.success && (result as any).profile) {
+            const teacher = (result as any).profile;
+            localStorage.setItem('sau_last_teacher', JSON.stringify(teacher));
+            localStorage.removeItem('sau_last_student');
+            setIsLoading(false);
+            onLogin(teacher);
+        } else if (result.success) {
             setIsLoading(false);
             setViewMode('VERIFICATION_SENT');
             setStep(1);

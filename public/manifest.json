@@ -8,16 +8,16 @@
   "theme_color": "#1e4b7a",
   "icons": [
     {
-      "src": "https://picsum.photos/seed/sau/192/192",
+      "src": "https://picsum.photos/seed/sau-logo/192/192",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "https://picsum.photos/seed/sau/512/512",
+      "src": "https://picsum.photos/seed/sau-logo/512/512",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }

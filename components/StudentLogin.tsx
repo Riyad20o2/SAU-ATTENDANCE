@@ -194,11 +194,17 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLogin, onBack }) => {
 
         const result = await registerStudent(profile, email, password);
 
-        if (result.success) {
+        if (result.success && (result as any).profile) {
+           const user = (result as any).profile;
+           localStorage.setItem('sau_last_student', JSON.stringify(user));
+           localStorage.removeItem('sau_last_teacher');
+           setIsLoading(false);
+           onLogin(user);
+        } else if (result.success) {
+           // Fallback if profile not returned
            setIsLoading(false);
            setViewMode('VERIFICATION_SENT');
            setStep(1);
-           // Clear sensitive fields
            setPassword('');
         } else {
            setError(result.error || 'Registration failed. Please try again.');

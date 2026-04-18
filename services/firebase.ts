@@ -146,7 +146,7 @@ export const resendVerificationEmail = async (email: string, password: string): 
 
 // --- STUDENT AUTH ---
 
-export const registerStudent = async (profile: StudentProfile, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+export const registerStudent = async (profile: StudentProfile, email: string, password: string): Promise<{ success: boolean; error?: string; profile?: StudentProfile }> => {
   // 1. Domain Check
   if (!isValidEducationalEmail(email)) {
       return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
@@ -164,18 +164,11 @@ export const registerStudent = async (profile: StudentProfile, email: string, pa
     const user = userCredential.user;
     
     try {
-        // Send verification email
-        const actionCodeSettings = {
-          url: 'https://sau-attendance.vercel.app',
-          handleCodeInApp: false,
-        };
-        await sendEmailVerification(user, actionCodeSettings);
-
         await updateAuthProfile(user, {
           displayName: profile.name
         });
 
-        await setDoc(doc(db, "students", user.uid), {
+        const studentData = {
           name: profile.name,
           email: email,
           studentId: profile.studentId,
@@ -186,11 +179,11 @@ export const registerStudent = async (profile: StudentProfile, email: string, pa
           profileImage: profile.profileImage || null,
           createdAt: Date.now(),
           uid: user.uid
-        });
+        };
 
-        await signOut(auth);
+        await setDoc(doc(db, "students", user.uid), studentData);
         
-        return { success: true };
+        return { success: true, profile: studentData as StudentProfile };
     } catch (profileError) {
         console.error("Profile creation failed, cleaning up user", profileError);
         await deleteUser(user).catch(err => console.error("Cleanup failed", err));
@@ -242,12 +235,6 @@ export const loginStudent = async (email: string, password: string): Promise<Stu
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Email Verification Check (Skip for demo accounts)
-    if (!user.emailVerified && !isDemoAccount(user.email)) {
-        await signOut(auth);
-        throw new Error("Email not verified. Please check your college email and click the verification link.");
-    }
-
     const docRef = doc(db, "students", user.uid);
     const docSnap = await getDoc(docRef);
 
@@ -307,7 +294,7 @@ export const loginStudent = async (email: string, password: string): Promise<Stu
 
   } catch (e: any) {
     console.error("Error logging in student", e);
-    if (e.message.includes("Email not verified") || e.message.includes("Teacher") || e.message.includes("not found")) {
+    if (e.message.includes("Teacher") || e.message.includes("not found")) {
         throw e;
     }
     if (e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
@@ -386,7 +373,7 @@ export const loginStudentWithGoogle = async (): Promise<StudentProfile | null> =
 
 // --- TEACHER AUTH ---
 
-export const registerTeacher = async (profile: TeacherProfile, password: string): Promise<{ success: boolean; error?: string }> => {
+export const registerTeacher = async (profile: TeacherProfile, password: string): Promise<{ success: boolean; error?: string; profile?: TeacherProfile }> => {
   if (!isValidEducationalEmail(profile.email)) {
     return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
   }
@@ -403,18 +390,11 @@ export const registerTeacher = async (profile: TeacherProfile, password: string)
     const user = userCredential.user;
 
     try {
-        // Send verification email
-        const actionCodeSettings = {
-          url: 'https://sau-attendance.vercel.app',
-          handleCodeInApp: false,
-        };
-        await sendEmailVerification(user, actionCodeSettings);
-
         await updateAuthProfile(user, {
             displayName: profile.name
         });
 
-        await setDoc(doc(db, "teachers", user.uid), {
+        const teacherData = {
             name: profile.name,
             email: profile.email,
             className: profile.className,
@@ -422,11 +402,11 @@ export const registerTeacher = async (profile: TeacherProfile, password: string)
             profileImage: profile.profileImage || null,
             createdAt: Date.now(),
             uid: user.uid
-        });
+        };
 
-        await signOut(auth);
+        await setDoc(doc(db, "teachers", user.uid), teacherData);
 
-        return { success: true };
+        return { success: true, profile: teacherData as TeacherProfile };
     } catch (profileError) {
         console.error("Profile creation failed, cleaning up user", profileError);
         await deleteUser(user).catch(err => console.error("Cleanup failed", err));
@@ -471,12 +451,6 @@ export const loginTeacher = async (email: string, password: string): Promise<Tea
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-
-    // Email Verification Check (Skip for demo accounts)
-    if (!user.emailVerified && !isDemoAccount(user.email)) {
-        await signOut(auth);
-        throw new Error("Email not verified. Please check your college email and click the verification link.");
-    }
 
     const docRef = doc(db, "teachers", user.uid);
     const docSnap = await getDoc(docRef);
@@ -528,7 +502,7 @@ export const loginTeacher = async (email: string, password: string): Promise<Tea
 
   } catch (e: any) {
     console.error("Error logging in teacher", e);
-    if (e.message.includes("Email not verified") || e.message.includes("Student") || e.message.includes("not found")) {
+    if (e.message.includes("Student") || e.message.includes("not found")) {
         throw e;
     }
     if (e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
