@@ -152,13 +152,6 @@ export const registerStudent = async (profile: StudentProfile, email: string, pa
       return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
   }
 
-  // Check if email already exists in Firestore
-  const emailQuery = query(collection(db, "students"), where("email", "==", email));
-  const emailSnap = await getDocs(emailQuery);
-  if (!emailSnap.empty) {
-      return { success: false, error: "This email is already registered. Please log in instead." };
-  }
-
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -376,13 +369,6 @@ export const loginStudentWithGoogle = async (): Promise<StudentProfile | null> =
 export const registerTeacher = async (profile: TeacherProfile, password: string): Promise<{ success: boolean; error?: string; profile?: TeacherProfile }> => {
   if (!isValidEducationalEmail(profile.email)) {
     return { success: false, error: "Access Denied: Please use your official college email (ending in .edu.iq)." };
-  }
-
-  // Check if email already exists in Firestore
-  const emailQuery = query(collection(db, "teachers"), where("email", "==", profile.email));
-  const emailSnap = await getDocs(emailQuery);
-  if (!emailSnap.empty) {
-      return { success: false, error: "This email is already registered. Please log in instead." };
   }
 
   try {
