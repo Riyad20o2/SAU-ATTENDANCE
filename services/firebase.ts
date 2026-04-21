@@ -93,7 +93,7 @@ const isValidEducationalEmail = (email: string | null | undefined): boolean => {
 // --- ADMIN AUTH ---
 
 export const loginAdmin = async (emailInput: string, passwordInput: string): Promise<any> => {
-  if (emailInput.toLowerCase() !== 'admin' || passwordInput !== 'Riyad@12345') {
+  if (emailInput.toLowerCase() !== 'admin' || passwordInput !== 'ayat@12345') {
     throw new Error("Invalid admin credentials");
   }
 

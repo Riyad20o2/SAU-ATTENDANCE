@@ -1,5 +1,6 @@
 import express from "express";
 import admin from "firebase-admin";
+import path from "path";
 
 // Initialize Firebase Admin
 if (!admin.apps.length) {
@@ -11,6 +12,27 @@ if (!admin.apps.length) {
         credential: admin.credential.cert(serviceAccount)
       });
       console.log("Firebase Admin initialized with Service Account.");
+      
+      // Auto-update Admin password in Firebase Authentication to match code configuration
+      const syncAdmin = async () => {
+        try {
+          const email = "admin@sau-attendance.local";
+          const password = "ayat@12345";
+          try {
+            const user = await admin.auth().getUserByEmail(email);
+            await admin.auth().updateUser(user.uid, { password });
+            console.log(`Firebase Auth: Password synced for ${email}`);
+          } catch (e: any) {
+            if (e.code === 'auth/user-not-found') {
+              await admin.auth().createUser({ email, password, emailVerified: true });
+              console.log(`Firebase Auth: Created new admin user: ${email}`);
+            }
+          }
+        } catch (err) {
+          console.error("Firebase Auth Sync Error:", err);
+        }
+      };
+      syncAdmin();
     } else {
       admin.initializeApp({
         projectId: "dsfs-dbce1"
@@ -77,9 +99,10 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist"));
-    app.get("*", (req, res) => {
-      res.sendFile("dist/index.html", { root: "." });
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*all", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
